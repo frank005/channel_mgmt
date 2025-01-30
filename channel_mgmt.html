@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agora API Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { overflow-y: auto; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen py-10">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <h1 class="text-xl font-bold mb-4 text-center">Agora API Tester</h1>
+        
+        <button onclick="toggleAuthPopup()" class="w-full bg-gray-600 hover:bg-gray-700 p-2 rounded font-bold mb-4">Set API Credentials</button>
+        
+        <div id="authPopup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm">
+                <h2 class="text-lg font-bold mb-2">RESTful API Credentials</h2>
+                <p class="text-sm mb-4">Enter your Agora Customer ID and Secret for authentication.</p>
+                <input id="customerId" class="w-full p-2 mb-2 rounded bg-gray-700 text-white" placeholder="Customer ID">
+                <input id="customerSecret" class="w-full p-2 mb-4 rounded bg-gray-700 text-white" placeholder="Customer Secret" type="password">
+                <button onclick="toggleAuthPopup()" class="w-full bg-red-600 hover:bg-red-700 p-2 rounded font-bold">Close</button>
+            </div>
+        </div>
+        
+        <div class="space-y-4">
+            <input id="appid" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="App ID">
+            <input id="cname" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Channel Name">
+            <input id="uid" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="UID">
+            <input id="ruleId" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Rule ID (Auto-filled)">
+            <input id="ip" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="IP (Optional)">
+            <input id="expireTime" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Expiration Time (Seconds)">
+            <div class="w-full p-2 rounded bg-gray-700 text-white">
+                <label class="block mb-2">Privileges:</label>
+                <select id="privileges" class="w-full p-2 rounded bg-gray-700 text-white">
+                    <option value="join_channel">Join Channel</option>
+                    <option value="publish_audio">Publish Audio</option>
+                    <option value="publish_video">Publish Video</option>
+                    <option value="publish_audio_video">Publish Audio & Video</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="sendRequest('POST', 'kicking-rule')" class="bg-green-600 hover:bg-green-700 p-2 rounded font-bold">Create Rules</button>
+                <button onclick="sendRequest('GET', 'kicking-rule')" class="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold">Get Rules</button>
+                <button onclick="sendRequest('PUT', 'kicking-rule')" class="bg-yellow-600 hover:bg-yellow-700 p-2 rounded font-bold">Update Expiration</button>
+                <button onclick="sendRequest('DELETE', 'kicking-rule')" class="bg-red-600 hover:bg-red-700 p-2 rounded font-bold">Delete Rules</button>
+            </div>
+        </div>
+        <pre id="response" class="mt-4 p-2 bg-gray-700 rounded text-sm"></pre>
+    </div>
+
+    <script>
+        function toggleAuthPopup() {
+            document.getElementById('authPopup').classList.toggle('hidden');
+        }
+
+        async function sendRequest(method, action) {
+            const appid = document.getElementById('appid').value;
+            const cname = document.getElementById('cname').value;
+            const uid = document.getElementById('uid').value;
+            const ruleId = document.getElementById('ruleId');
+            const ip = document.getElementById('ip').value;
+            const expireTime = document.getElementById('expireTime').value;
+            const privileges = document.getElementById('privileges').value;
+            const customerId = document.getElementById('customerId').value;
+            const customerSecret = document.getElementById('customerSecret').value;
+
+            if (!appid) {
+                alert("App ID is required");
+                return;
+            }
+
+            let baseUrl = `http://api.sd-rtn.com/dev/v1/${action}`;
+            if (method === 'GET') {
+                baseUrl += `?appid=${appid}`;
+            }
+            
+            let payload = {};
+            if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+                payload = {
+                    appid,
+                    cname,
+                    uid: parseInt(uid),
+                    ip: ip || "",
+                    time: parseInt(expireTime),
+                    privileges: privileges.includes("publish_audio_video") ? ["publish_audio", "publish_video"] : [privileges]
+                };
+                if (method === 'PUT' || method === 'DELETE') {
+                    payload.id = parseInt(ruleId.value);
+                }
+            }
+            
+            try {
+                const response = await fetch(baseUrl, {
+                    method: method,
+                    headers: { 
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(`${customerId}:${customerSecret}`)
+                    },
+                    body: method !== 'GET' ? JSON.stringify(payload) : null
+                });
+                const result = await response.json();
+                document.getElementById('response').innerText = JSON.stringify(result, null, 2);
+                if (method === 'POST' && result.id) {
+                    ruleId.value = result.id;
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                document.getElementById('response').innerText = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
