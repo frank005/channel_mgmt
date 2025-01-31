@@ -246,7 +246,7 @@
                     return;
                 }
 
-                let baseUrl = `http://api.sd-rtn.com/dev/v1/${action}`;
+                let baseUrl = `https://api.sd-rtn.com/dev/v1/${action}`;
                 if (method === "GET") {
                     baseUrl += `?appid=${appid}`;
                 }
@@ -312,7 +312,7 @@
 
                 try {
                     const response = await fetch(
-                        `http://api.agora.io/dev/v1/channel/user/${appid}/${channelName}${hostOnly ? "/hostsOnly" : ""}`,
+                        `https://api.agora.io/dev/v1/channel/user/${appid}/${channelName}${hostOnly ? "/hostsOnly" : ""}`,
                         {
                             method: "GET",
                             headers: {
