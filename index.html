@@ -5,26 +5,34 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Agora Ban API Tester</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="modern-ui-library.css">
         <style>
             body {
                 overflow-y: auto;
+                background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a) !important;
             }
         </style>
     </head>
-    <body class="bg-gray-900 text-white min-h-screen py-10 px-4">
+    <body class="text-white min-h-screen">
+        <!-- Popup notification section -->
+        <div id="popup-section" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50"></div>
+        
         <div class="max-w-6xl mx-auto">
             <!-- API Credentials Button moved outside -->
             <button
                 onclick="toggleAuthPopup()"
-                class="mb-6 bg-gray-600 hover:bg-gray-700 p-2 rounded font-bold"
+                class="mb-6 modern-btn modern-btn-secondary"
             >
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
                 Set API Credentials
             </button>
 
             <div class="grid md:grid-cols-2 gap-6">
                 <!-- Original Ban Management Panel -->
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h1 class="text-xl font-bold mb-4 text-center">
+                <div class="modern-card">
+                    <h1 class="text-xl font-bold mb-4 text-center gradient-text-primary">
                         Agora Ban User Privilege API Tester
                     </h1>
 
@@ -36,35 +44,32 @@
                         /> -->
                         <input
                             id="cname"
-                            class="w-full p-2 rounded bg-gray-700 text-white"
+                            type="text"
                             placeholder="Channel Name"
                         />
                         <input
                             id="uid"
-                            class="w-full p-2 rounded bg-gray-700 text-white"
+                            type="text"
                             placeholder="UID"
                         />
                         <input
                             id="ruleId"
-                            class="w-full p-2 rounded bg-gray-700 text-white"
+                            type="text"
                             placeholder="Rule ID (Auto-filled)"
                         />
                         <input
                             id="ip"
-                            class="w-full p-2 rounded bg-gray-700 text-white"
+                            type="text"
                             placeholder="IP (Optional)"
                         />
                         <input
                             id="expireTime"
-                            class="w-full p-2 rounded bg-gray-700 text-white"
+                            type="number"
                             placeholder="Expiration Time (Seconds)"
                         />
-                        <div class="w-full p-2 rounded bg-gray-700 text-white">
-                            <label class="block mb-2">Privileges:</label>
-                            <select
-                                id="privileges"
-                                class="w-full p-2 rounded bg-gray-700 text-white"
-                            >
+                        <div>
+                            <label>Privileges:</label>
+                            <select id="privileges">
                                 <option value="join_channel">
                                     Join Channel
                                 </option>
@@ -82,71 +87,62 @@
                         <div class="grid grid-cols-2 gap-2">
                             <button
                                 onclick="sendRequest('POST', 'kicking-rule')"
-                                class="bg-green-600 hover:bg-green-700 p-2 rounded font-bold"
+                                class="modern-btn modern-btn-success"
                             >
                                 Create Rules
                             </button>
                             <button
                                 onclick="sendRequest('GET', 'kicking-rule')"
-                                class="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold"
+                                class="modern-btn modern-btn-primary"
                             >
                                 Get Rules
                             </button>
                             <button
                                 onclick="sendRequest('PUT', 'kicking-rule')"
-                                class="bg-yellow-600 hover:bg-yellow-700 p-2 rounded font-bold"
+                                class="modern-btn modern-btn-warning"
                             >
                                 Update Expiration
                             </button>
                             <button
                                 onclick="sendRequest('DELETE', 'kicking-rule')"
-                                class="bg-red-600 hover:bg-red-700 p-2 rounded font-bold"
+                                class="modern-btn modern-btn-danger"
                             >
                                 Delete Rules
                             </button>
                         </div>
                     </div>
-                    <pre
-                        id="response"
-                        class="mt-4 p-2 bg-gray-700 rounded text-sm"
-                    ></pre>
+                    <pre id="response" class="mt-4"></pre>
                 </div>
 
                 <!-- New User Query Panel -->
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h1 class="text-xl font-bold mb-4 text-center">
+                <div class="modern-card">
+                    <h1 class="text-xl font-bold mb-4 text-center gradient-text-primary">
                         Query Channel Users
                     </h1>
 
                     <div class="space-y-4">
                         <input
                             id="queryChannel"
-                            class="w-full p-2 rounded bg-gray-700 text-white"
+                            type="text"
                             placeholder="Channel Name"
                         />
 
-                        <div
-                            class="flex items-center space-x-2 p-2 rounded bg-gray-700"
-                        >
+                        <div class="flex items-center space-x-2">
                             <input
                                 type="checkbox"
                                 id="hostOnly"
-                                class="w-4 h-4"
                             />
-                            <label for="hostOnly">Host Only</label>
+                            <label for="hostOnly" class="mb-0">Host Only</label>
                         </div>
 
                         <button
                             onclick="queryUsers()"
-                            class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold"
+                            class="w-full modern-btn modern-btn-primary"
                         >
                             Query Users
                         </button>
 
-                        <pre
-                            id="queryResponse"
-                            class="mt-4 p-2 bg-gray-700 rounded text-sm min-h-[200px]"
-                        ></pre>
+                        <pre id="queryResponse" class="mt-4 min-h-[200px]"></pre>
                     </div>
                 </div>
             </div>
@@ -154,45 +150,76 @@
             <!-- Auth Popup -->
             <div
                 id="authPopup"
-                class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center"
+                class="hidden fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50"
             >
-                <div
-                    class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm"
-                >
-                    <h2 class="text-lg font-bold mb-2">
-                        RESTful API Credentials
-                    </h2>
-                    <p class="text-sm mb-4">
+                <div class="modern-card w-full max-w-sm">
+                    <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700/50">
+                        <div class="icon-container">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold gradient-text-primary">
+                            RESTful API Credentials
+                        </h2>
+                    </div>
+                    <p class="text-sm mb-4 text-slate-400">
                         Enter your Agora Customer ID and Secret for
                         authentication.
                     </p>
-                    <input
-                        id="customerId"
-                        class="w-full p-2 mb-2 rounded bg-gray-700 text-white"
-                        placeholder="Customer ID"
-                    />
-                    <input
-                        id="customerSecret"
-                        class="w-full p-2 mb-4 rounded bg-gray-700 text-white"
-                        placeholder="Customer Secret"
-                        type="password"
-                    />
-                    <input
-                        id="appid"
-                        class="w-full p-2 mb-4 rounded bg-gray-700 text-white"
-                        placeholder="App ID"
-                    />
-                    <button
-                        onclick="toggleAuthPopup()"
-                        class="w-full bg-red-600 hover:bg-red-700 p-2 rounded font-bold"
-                    >
-                        Close
-                    </button>
+                    <div class="space-y-4">
+                        <input
+                            id="customerId"
+                            type="text"
+                            placeholder="Customer ID"
+                        />
+                        <input
+                            id="customerSecret"
+                            type="password"
+                            placeholder="Customer Secret"
+                        />
+                        <input
+                            id="appid"
+                            type="text"
+                            placeholder="App ID"
+                        />
+                    </div>
+                    <div class="flex justify-end gap-4 mt-6">
+                        <button
+                            onclick="toggleAuthPopup()"
+                            class="modern-btn modern-btn-secondary"
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <script>
+            // Popup notification system
+            var popups = 0;
+            function showPopup(message) {
+                const newPopup = popups + 1;
+                const y = document.createElement('div');
+                y.id = `popup-${newPopup}`;
+                y.className = "popupHidden";
+                y.textContent = message;
+                document.getElementById("popup-section").appendChild(y);
+                const x = document.getElementById(`popup-${newPopup}`);
+                x.className = "popupShow";
+                const z = popups * 10;
+                x.style.left = `${50 + z}%`;
+                popups++;
+                setTimeout(function() {
+                    const popup = document.getElementById(`popup-${newPopup}`);
+                    if (popup) {
+                        popup.remove();
+                        popups--;
+                    }
+                }, 3000);
+            }
+
             let customerId = localStorage.getItem("customerId");
             let customerSecret = localStorage.getItem("customerSecret");
             let appid = localStorage.getItem("appid");
@@ -242,7 +269,7 @@
                 //     document.getElementById("customerSecret").value;
 
                 if (!appid) {
-                    alert("App ID is required");
+                    showPopup("App ID is required");
                     return;
                 }
 
@@ -289,10 +316,18 @@
                         JSON.stringify(result, null, 2);
                     if (method === "POST" && result.id) {
                         ruleId.value = result.id;
+                        showPopup("Rule created successfully!");
+                    } else if (method === "GET") {
+                        showPopup("Rules retrieved successfully!");
+                    } else if (method === "PUT") {
+                        showPopup("Rule updated successfully!");
+                    } else if (method === "DELETE") {
+                        showPopup("Rule deleted successfully!");
                     }
                 } catch (error) {
                     document.getElementById("response").innerText =
                         `Error: ${error.message}`;
+                    showPopup(`Error: ${error.message}`);
                 }
             }
 
@@ -306,7 +341,7 @@
                 // appid = document.getElementById("appid").value;
 
                 if (!channelName) {
-                    alert("Channel Name is required");
+                    showPopup("Channel Name is required");
                     return;
                 }
 
@@ -326,9 +361,11 @@
                     const result = await response.json();
                     document.getElementById("queryResponse").innerText =
                         JSON.stringify(result, null, 2);
+                    showPopup("Users queried successfully!");
                 } catch (error) {
                     document.getElementById("queryResponse").innerText =
                         `Error: ${error.message}`;
+                    showPopup(`Error: ${error.message}`);
                 }
             }
         </script>
@@ -336,7 +373,7 @@
         href="https://github.com/AgoraIO-Community/channel_mgmt"
         target="_blank"
         rel="noopener noreferrer"
-        class="fixed top-4 right-4 w-10 h-10 bg-gray-800 flex items-center justify-center rounded-full shadow-lg hover:bg-gray-700 transition"
+        class="fixed top-4 right-4 w-10 h-10 modern-card flex items-center justify-center rounded-full shadow-lg hover:border-cyan-400/50 transition"
         title="View my GitHub"
         >
         <!-- Inline SVG for GitHub icon -->
